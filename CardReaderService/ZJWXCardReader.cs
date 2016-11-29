@@ -442,6 +442,12 @@ namespace CardReaderService
             }
         }
 
+        public ZJWXCardReader()
+        {
+            this.type = DeviceType.Printer;
+            this.vendor = "ZJWX";
+        }
+
         // helper
         public int getDevNo(string resultStr)
         {

@@ -48,8 +48,11 @@ namespace CardReaderService
 
         public void start()
         {
+            // init cardreader
+            ZJWXCardReader zjwxCardReader = new ZJWXCardReader();
+
             listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
-            listener.Prefixes.Add("http://localhost:29527/cardreader/");
+            listener.Prefixes.Add(ConfigurationManager.AppSettings["HttpEndpoint"]);
 
             listener.Start();
             listenFlag = true;
@@ -58,20 +61,71 @@ namespace CardReaderService
             while (listenFlag) 
             {
                 HttpListenerContext ctx = listener.GetContext();
-                
+                string jsonp = null;
+
                 // get params from ctx
-                string name = ctx.Request.QueryString["name"];
+                DeviceType type = (DeviceType)int.Parse(ctx.Request.QueryString["type"]); // printer, cardreader
+                string vendor = ctx.Request.QueryString["vendor"]; // YuChuan, ZJWX
+                string operation = ctx.Request.QueryString["operation"];
 
                 // do work
-                // string greetings = "Hello, " + name;
-                string greetings = string.Format("\"greetings\":\"{0}\"", "Hello, " + name);
-                string jsonp = JsonpHandler.handle(ctx.Request, greetings);
+                switch (type)
+                {
+                    case DeviceType.Printer:
+                        // not implemented yet
+                        break;
 
-                // write response
-                ctx.Response.StatusCode = 200;
+                    case DeviceType.CardReader:
+                        switch (vendor)
+                        {
+                            case "YuChuan":
+                                // not implemented yet
+                                break;
+
+                            case "ZJWX":
+                                switch (operation)
+                                {
+                                    case "checkreader":
+                                        break;
+                                    case "makecard":
+                                        break;
+                                    case "clearcard":
+                                        break;
+                                    case "writecard":
+                                        break;
+                                    case "readcard":
+                                        CardInfo cardInfo = zjwxCardReader.ReadCard();
+                                        if (cardInfo == null)
+                                        {
+                                            ctx.Response.StatusCode = 500;
+                                        }
+                                        else
+                                        {
+                                            string cardInfoStr = cardInfo.Serialize();
+                                            jsonp = JsonpHandler.handle(ctx.Request, cardInfoStr);
+                                            ctx.Response.StatusCode = 200;
+                                        }
+                                        break;
+                                }
+                                break;
+
+                            default:
+                                ctx.Response.StatusCode = 404;
+                                break;
+                        }
+                        break;
+
+                    default:
+                        ctx.Response.StatusCode = 404;
+                        break;
+                }        
+
+                // write response        
                 using (StreamWriter writer = new StreamWriter(ctx.Response.OutputStream))
                 {
-                    writer.Write(jsonp);
+                    if (jsonp != null)
+                        writer.Write(jsonp);
+
                     writer.Close();
                 }
 
