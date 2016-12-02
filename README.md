@@ -18,7 +18,7 @@ CardReaderService doesn't provide user adjustable settings. But at compiling-tim
 # Log
 Check windows event viewer for log, all logs are exported to application category.
 # Installation
-Install service with InstallUtil. Start cmdline with admin privilege.
+Install service with InstallUtil. Start VS2015 x64 Native Tools cmdline with admin privilege.
 ```
 installutil CardReaderService.exe
 net start CardReaderService
