@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -17,6 +19,11 @@ namespace CardReaderService
         private string startoverDate;
         private int[] price; // in cents
         private int[] vol;
+
+        public ZJWXLadderInfo()
+        {
+            // do nothing
+        }
 
         public ZJWXLadderInfo(int _priceNo, string _execDate, string _startoverDate, int[] _price, int[] _vol)
         {
@@ -110,14 +117,24 @@ namespace CardReaderService
             char[] sp = { '|' };
             string[] ladderArr = ladderStr.Split(sp);
 
-            this.PriceNo = int.Parse(ladderArr[0]);
+            int _priceNo = 0;
+            int.TryParse(ladderArr[0], out _priceNo);
+            this.PriceNo = _priceNo;
+
             this.ExecDate = ladderArr[1];
             this.StartoverDate = ladderArr[2];
 
+            this.Price = new int[(ladderArr.Length - 3) / 2];
+            this.Vol = new int[(ladderArr.Length - 3) / 2];
+
             for (int i = 0; i < (ladderArr.Length - 3) / 2; i++)
             {
-                this.Price[i] = int.Parse(ladderArr[i * 2 + 3]);
-                this.Vol[i] = int.Parse(ladderArr[i * 2 + 4]);
+                int _price = 0;
+                int _vol = 0;
+                int.TryParse(ladderArr[i * 2 + 3], out _price);
+                this.Price[i] = _price;
+                int.TryParse(ladderArr[i * 2 + 4], out _vol);
+                this.Vol[i] = _vol;
             }
 
             return true;
@@ -125,9 +142,9 @@ namespace CardReaderService
 
         public override string Serialize()
         {
-            string json = "LadderInfo:{";
+            string json = "{";
 
-            json += "\"priceNo\":\"" + this.PriceNo + "\"," +
+            json += "\"priceNo\":" + this.PriceNo + "," +
                 "\"execDate\":\"" + this.ExecDate + "\"," +
                 "\"startoverDate\":\"" + this.StartoverDate + "\",";
                 
@@ -309,6 +326,8 @@ namespace CardReaderService
         public void fill(string paramStr, string ladderStr)
         {
             parseParamStr(paramStr);
+            if (this.ladder == null)
+                this.Ladder = new ZJWXLadderInfo();
             this.Ladder.parseLadderString(ladderStr);
         }
 
@@ -317,15 +336,28 @@ namespace CardReaderService
             char[] sp = { '|' };
             string[] paramArr = paramStr.Split(sp);
 
+            int _orderAmount = 0;
+            int _orderNo = 0;
+            int _watchLimit = 0;
+            int _overdraftAmount = 0;
+            int _warningAmount = 0;
+            int _idle = 0;
+
             this.WatchType = paramArr[0];
             this.CardType = paramArr[1];
             this.CardNo = paramArr[2];
-            this.OrderAmount = int.Parse(paramArr[3]);
-            this.OrderNo = int.Parse(paramArr[4]);
-            this.WatchLimit = int.Parse(paramArr[5]);
-            this.OverdraftAmount = int.Parse(paramArr[6]);
-            this.WarningAmount = int.Parse(paramArr[7]);
-            this.Idle = int.Parse(paramArr[8]);
+            int.TryParse(paramArr[3], out _orderAmount);
+            this.OrderAmount = _orderAmount;
+            int.TryParse(paramArr[4], out _orderNo);
+            this.OrderNo = _orderNo;
+            int.TryParse(paramArr[5], out _watchLimit);
+            this.WatchLimit = _watchLimit;
+            int.TryParse(paramArr[6], out _overdraftAmount);
+            this.OverdraftAmount = _overdraftAmount;
+            int.TryParse(paramArr[7], out _warningAmount);
+            this.WarningAmount = _warningAmount;
+            int.TryParse(paramArr[8], out _idle);
+            this.Idle = _idle;
 
             return true;
         }
@@ -355,7 +387,31 @@ namespace CardReaderService
 
         public override string Serialize()
         {
-            throw new NotImplementedException();
+            string ret = "{";
+            ret += string.Format("\"watchType\":{0}," +
+                "\"cardType\":{1}," +
+                "\"cardNo\":\"{2}\"," +
+                "\"orderAmount\":{3}," +
+                "\"orderNo\":{4}," +
+                "\"watchLimit\":{5}," +
+                "\"overdraftAmount\":{6}," +
+                "\"warningAmount\":{7}," +
+                "\"idle\":{8}," +
+                "\"ladder\":{9}",
+                this.WatchType,
+                this.CardType,
+                this.CardNo,
+                this.OrderAmount,
+                this.OrderNo,
+                this.WatchLimit,
+                this.OverdraftAmount,
+                this.WarningAmount,
+                this.Idle,
+                this.Ladder.Serialize()
+                );
+            ret += "}";
+
+            return ret;
         }
 
         public override bool Deserialize(HttpListenerRequest request)
@@ -364,7 +420,59 @@ namespace CardReaderService
         }
     }
 
-    class ZJWXCardReader : CardReaderAdpator
+    public class ZJWXOrderInfo : OrderInfo
+    {
+        private string pamaInfo;
+        private string ladderInfo;
+
+        public string PamaInfo
+        {
+            get
+            {
+                return pamaInfo;
+            }
+
+            set
+            {
+                pamaInfo = value;
+            }
+        }
+
+        public string LadderInfo
+        {
+            get
+            {
+                return ladderInfo;
+            }
+
+            set
+            {
+                ladderInfo = value;
+            }
+        }
+
+        public override bool Deserialize(HttpListenerRequest request)
+        {
+            bool ret = false;
+
+            // get order params from request
+            if (request.QueryString["PamaInfo"] != null && request.QueryString["LadderInfo"] != null)
+            {
+                this.PamaInfo = request.QueryString["PamaInfo"];
+                this.LadderInfo = request.QueryString["LadderInfo"];
+                ret = true;
+            }
+
+            return ret;
+        }
+
+        public override string Serialize()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ZJWXCardReader : CardReaderAdpator
     {
         // DLL imports
         [DllImportAttribute("ZJWXGas.dll", EntryPoint = "ZJWX_GasInitPort", CallingConvention = CallingConvention.StdCall)]
@@ -474,16 +582,26 @@ namespace CardReaderService
 
             // open port
             int ret = ZJWX_GasInitPort((int)this.Port, (int)this.Baudrate, results);
-            string resultsStr = System.Text.Encoding.Default.GetString(results).Trim('\0'); ;
+            if (ret == -1)
+            {
+                return null;
+            }
+
+            string resultsStr = System.Text.Encoding.Default.GetString(results).Trim('\0');
             int dev = getDevNo(resultsStr);
 
             // read card
             ret = ZJWX_GasReadCardInfo(dev, PamaInfo, LadderInfo, results);
+            if (ret == -1)
+            {
+                return null;
+            }
 
             string PamaInfoStr = System.Text.Encoding.Default.GetString(PamaInfo).Trim('\0');
             string LadderInfoStr = System.Text.Encoding.Default.GetString(LadderInfo).Trim('\0');
             resultsStr = System.Text.Encoding.Default.GetString(results).Trim('\0');
 
+            // EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "PamaInfoStr: " + PamaInfoStr + "\nLadderInfoStr: " + LadderInfoStr, EventLogEntryType.Information);
             cardInfo.fill(PamaInfoStr, LadderInfoStr);
 
             // close port
@@ -494,7 +612,30 @@ namespace CardReaderService
 
         public override CardReaderResponseCode WriteCard(OrderInfo order)
         {
-            throw new NotImplementedException();
+            byte[] results = new byte[255];
+
+            // open port
+            int ret = ZJWX_GasInitPort((int)this.Port, (int)this.Baudrate, results);
+            if (ret == -1)
+            {
+                return CardReaderResponseCode.CommError;
+            }
+
+            string resultsStr = System.Text.Encoding.Default.GetString(results).Trim('\0');
+            int dev = getDevNo(resultsStr);
+
+            // write card
+            ret = ZJWX_GasWriteCardInfo(dev, Encoding.Default.GetBytes(((ZJWXOrderInfo)order).PamaInfo), Encoding.Default.GetBytes(((ZJWXOrderInfo)order).LadderInfo), results);
+            if (ret == -1)
+            {
+                return CardReaderResponseCode.WriteError;
+            }
+
+            // close port
+            ret = ZJWX_GasExitPort(dev);
+            // we don't care if there's closing error since writing is already done
+
+            return CardReaderResponseCode.Success;
         }
 
         public override CardReaderResponseCode MakeCard(CardMetaInfo metaInfo)

@@ -24,7 +24,7 @@ namespace CardReaderService
         public static string handle(HttpListenerRequest req, string resp)
         {
             string callback = req.QueryString[ConfigurationManager.AppSettings["JsonpCallbackName"]];
-            string script = callback + "({" + resp + "})";
+            string script = callback + "(" + resp + ")";
 
             return script;
         }
@@ -64,7 +64,10 @@ namespace CardReaderService
                 string jsonp = null;
 
                 // get params from ctx
-                DeviceType type = (DeviceType)int.Parse(ctx.Request.QueryString["type"]); // printer, cardreader
+                DeviceType type = DeviceType.CardReader;
+                int _type = 0;
+                int.TryParse(ctx.Request.QueryString["type"], out _type); // printer, cardreader
+                type = (DeviceType)_type;
                 string vendor = ctx.Request.QueryString["vendor"]; // YuChuan, ZJWX
                 string operation = ctx.Request.QueryString["operation"];
 
@@ -92,11 +95,34 @@ namespace CardReaderService
                                     case "clearcard":
                                         break;
                                     case "writecard":
+                                        ZJWXOrderInfo orderInfo = new ZJWXOrderInfo();
+                                        orderInfo.Deserialize(ctx.Request);
+                                        CardReaderResponseCode result = zjwxCardReader.WriteCard(orderInfo);
+                                        switch (result)
+                                        {
+                                            case CardReaderResponseCode.CommError:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Open port error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                            case CardReaderResponseCode.WriteError:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Write error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                            case CardReaderResponseCode.Success:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
+                                                ctx.Response.StatusCode = 200;
+                                                break;
+                                            default:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Unknown error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                        }
                                         break;
                                     case "readcard":
                                         CardInfo cardInfo = zjwxCardReader.ReadCard();
                                         if (cardInfo == null)
                                         {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\"}");
                                             ctx.Response.StatusCode = 500;
                                         }
                                         else
@@ -110,12 +136,14 @@ namespace CardReaderService
                                 break;
 
                             default:
+                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Vendor not found\"}");
                                 ctx.Response.StatusCode = 404;
                                 break;
                         }
                         break;
 
                     default:
+                        jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Device type not found\"}");
                         ctx.Response.StatusCode = 404;
                         break;
                 }        
