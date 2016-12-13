@@ -43,7 +43,7 @@ For ZJWX card reader, parameters depends on operation.
       No parameter needed.
    2. makecard  
       Please refer to 'writecard', the parameters are the same.  
-      However, you should pay attentaion to WatchType, CardType and CardNo when you make card:  
+      However, you should pay attention to WatchType, CardType and CardNo when you make card:  
       WatchType - 1:气量表, 2:金额表  
       CardType - 1:小表设置卡, 2:大表设置卡, 3:清除卡, 4:转存卡, 5:用户卡, 6:检测卡  
       CardNo - For CardType=1, CardNo must be 07FFFFFFFFFF, for CardType=2, CardNo must be 17FFFFFFFFFF  
