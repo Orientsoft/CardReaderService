@@ -472,6 +472,84 @@ namespace CardReaderService
         }
     }
 
+    public class ZJWXCardMetaInfo : CardMetaInfo
+    {
+        private int meterType;
+        private int cardType;
+        private byte[] cardNo;
+
+        public int MeterType
+        {
+            get
+            {
+                return meterType;
+            }
+
+            set
+            {
+                meterType = value;
+            }
+        }
+
+        public int CardType
+        {
+            get
+            {
+                return cardType;
+            }
+
+            set
+            {
+                cardType = value;
+            }
+        }
+
+        public byte[] CardNo
+        {
+            get
+            {
+                return cardNo;
+            }
+
+            set
+            {
+                cardNo = value;
+            }
+        }
+
+        public override bool Deserialize(HttpListenerRequest request)
+        {
+            bool ret = false;
+            int mt;
+            int ct;
+
+            // get order params from request
+            if (request.QueryString["MeterType"] != null && request.QueryString["CardType"] != null && request.QueryString["CardNo"] != null)
+            {
+                if (int.TryParse(request.QueryString["MeterType"], out mt) == true)
+                    this.MeterType = mt;
+                else
+                    return ret;
+
+                if (int.TryParse(request.QueryString["CardType"], out ct) == true)
+                    this.CardType = ct;
+                else
+                    return ret;
+
+                this.CardNo = Encoding.Default.GetBytes(request.QueryString["CardNo"]);
+
+                ret = true;
+            }
+
+            return ret;
+        }
+
+        public override string Serialize()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ZJWXCardReader : CardReaderAdpator
     {
         // DLL imports
@@ -640,7 +718,30 @@ namespace CardReaderService
 
         public override CardReaderResponseCode MakeCard(CardMetaInfo metaInfo)
         {
-            throw new NotImplementedException();
+            byte[] results = new byte[255];
+
+            // open port
+            int ret = ZJWX_GasInitPort((int)this.Port, (int)this.Baudrate, results);
+            if (ret == -1)
+            {
+                return CardReaderResponseCode.CommError;
+            }
+
+            string resultsStr = System.Text.Encoding.Default.GetString(results).Trim('\0');
+            int dev = getDevNo(resultsStr);
+
+            // make card
+            ret = ZJWX_GasMakeCard(dev, ((ZJWXCardMetaInfo)metaInfo).MeterType, ((ZJWXCardMetaInfo)metaInfo).CardType, ((ZJWXCardMetaInfo)metaInfo).CardNo, results);
+            if (ret == -1)
+            {
+                return CardReaderResponseCode.CardError;
+            }
+
+            // close port
+            ret = ZJWX_GasExitPort(dev);
+            // we don't care if there's closing error since writing is already done
+
+            return CardReaderResponseCode.Success;
         }
 
         public override CardReaderResponseCode ClearCard()

@@ -71,6 +71,10 @@ namespace CardReaderService
                 string vendor = ctx.Request.QueryString["vendor"]; // YuChuan, ZJWX
                 string operation = ctx.Request.QueryString["operation"];
 
+                ZJWXOrderInfo orderInfo = new ZJWXOrderInfo();
+                ZJWXCardMetaInfo metaInfo = new ZJWXCardMetaInfo();
+                CardReaderResponseCode result;
+
                 // do work
                 switch (type)
                 {
@@ -91,13 +95,33 @@ namespace CardReaderService
                                     case "checkreader":
                                         break;
                                     case "makecard":
+                                        metaInfo.Deserialize(ctx.Request);
+                                        result = zjwxCardReader.MakeCard(metaInfo);
+                                        switch (result)
+                                        {
+                                            case CardReaderResponseCode.CommError:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Open port error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                            case CardReaderResponseCode.CardError:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                            case CardReaderResponseCode.Success:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
+                                                ctx.Response.StatusCode = 200;
+                                                break;
+                                            default:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Unknown error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                        }
                                         break;
                                     case "clearcard":
                                         break;
                                     case "writecard":
-                                        ZJWXOrderInfo orderInfo = new ZJWXOrderInfo();
                                         orderInfo.Deserialize(ctx.Request);
-                                        CardReaderResponseCode result = zjwxCardReader.WriteCard(orderInfo);
+                                        result = zjwxCardReader.WriteCard(orderInfo);
                                         switch (result)
                                         {
                                             case CardReaderResponseCode.CommError:
