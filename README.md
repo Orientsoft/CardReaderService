@@ -38,7 +38,7 @@ These parameters are required by every API of CardReaderService.
    2. vendor - ZJWX  
    3. operation - for ZJWX, checkreader, makecard, clearcard, writecard, readcard  
 * ZJWX Operation  
-For ZJWX card reader, parameters are depends on operation.  
+For ZJWX card reader, parameters depends on operation.  
    1. checkreader  
       No parameter needed.
    2. makecard  
