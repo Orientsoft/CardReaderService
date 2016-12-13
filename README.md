@@ -42,15 +42,22 @@ For ZJWX card reader, parameters are depends on operation.
    1. checkreader  
       No parameter needed.
    2. makecard  
-      to be filled
+      Please refer to 'writecard', the parameters are the same.  
+      However, you should pay attentaion to WatchType, CardType and CardNo when you make card:  
+      WatchType - 1:气量表, 2:金额表  
+      CardType - 1:小表设置卡, 2:大表设置卡, 3:清除卡, 4:转存卡, 5:用户卡, 6:检测卡  
+      CardNo - For CardType=1, CardNo must be 07FFFFFFFFFF, for CardType=2, CardNo must be 17FFFFFFFFFF  
+      For CardType=5, CardNo must start with 0 (eg. 012345678909)  
+      Otherwise, CardNo should be 4 digits.  
+      Most card type could be set only once. So be careful with CardType setting.
    3. clearcard  
-      to be filled  
+      No parameter needed.  
    4. writecard  
       PamaInfo - 表类型|卡类型|卡号|充值量|充值序号|表存上限|透支量|报警量|闲置时间 (eg. 1|5|012345678909|10.00|FFFF|100.0|0.0|0|100)  
       LadderInfo - 单价序号|价格执行时间(yyMMddHH) |阶梯周期起始时间(YYMMDD)|阶梯1价格| 阶梯1气量|阶梯2价格| 阶梯2气量|阶梯3价格|阶梯3气量|阶梯4价格|阶梯4气量|阶梯5价格|阶梯5气量 (eg. |||1.0000|||||||||)  
-   5. readcard
-      No parameter needed.
-* Return value
+   5. readcard  
+      No parameter needed.  
+* Return Value  
 CardReaderService will return standard HTTP status code, as well as JSONP response object.  
 * Example  
 For example, the following JSONP call should write info to card:  
