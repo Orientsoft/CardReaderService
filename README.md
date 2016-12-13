@@ -30,6 +30,8 @@ An Inno Setup script has been created under CardReaderService/CardReaderServiceI
 Compiling the script will create an installer under CardReaderService/CardReaderServiceInstaller/Output.  
 The installer will copy all files needed and start the service automatically. When uninstalling, the service will be stopped and removed.  
 CardReaderService will start automatically during system reboot.
+# .NET Framework  
+.Net framework 4.0 or higher is required.  
 # API  
 By default, CardReaderService response to JSONP request from http://localhost:29527/cardreader endpoint.  
 * Common Parameter  
