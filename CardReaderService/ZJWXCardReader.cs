@@ -390,7 +390,7 @@ namespace CardReaderService
                 "\"cardType\":{1}," +
                 "\"cardNo\":\"{2}\"," +
                 "\"orderAmount\":{3}," +
-                "\"orderNo\":{4}," +
+                "\"orderNo\":\"{4}\"," +
                 "\"watchLimit\":{5}," +
                 "\"overdraftAmount\":{6}," +
                 "\"warningAmount\":{7}," +
