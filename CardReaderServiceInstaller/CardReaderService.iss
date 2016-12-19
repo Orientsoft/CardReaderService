@@ -1,7 +1,7 @@
 [Setup]
 AppName=CardReaderService
 AppVersion=1.0
-DefaultDirName={pf}\CardReaderService
+DefaultDirName=C:\CardReaderService
 DefaultGroupName=CardReaderService
 Compression=lzma2
 SolidCompression=yes
