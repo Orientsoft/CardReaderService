@@ -10,19 +10,20 @@ OutputDir=..\..\..\CardReaderServiceInstaller\Output
 OutputBaseFilename=CardReaderService_Installer
 
 [Files]
-Source: "CardReaderService.exe"; DestDir: "{app}"
-Source: "CardReaderService.exe.config"; DestDir: "{app}"
-Source: "CardReaderService.pdb"; DestDir: "{app}"
-Source: "1608card.dll"; DestDir: "{app}"
-Source: "Mwic_32.dll"; DestDir: "{app}"
-Source: "ViewShineICGas.dll"; DestDir: "{app}"
-Source: "WDCRWV.DLL"; DestDir: "{app}"
-Source: "WRwCard.dll"; DestDir: "{app}"
-Source: "ZJWXGas.dll"; DestDir: "{app}"
+Source: "CardReaderService.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "CardReaderService.exe.config"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "CardReaderService.pdb"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "1608card.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "Mwic_32.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "ViewShineICGas.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "WDCRWV.DLL"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "WRwCard.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "ZJWXGas.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
 [Run]
 Filename: "{dotnet40}\InstallUtil.exe"; Parameters: "{app}\CardReaderService.exe"
 Filename: "net"; Parameters: "start CardReaderService"
 
 [UninstallRun]
+Filename: "net"; Parameters: "stop CardReaderService"
 Filename: "{dotnet40}\InstallUtil.exe"; Parameters: "/u {app}\CardReaderService.exe"

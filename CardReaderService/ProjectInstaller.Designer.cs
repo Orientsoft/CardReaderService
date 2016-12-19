@@ -42,6 +42,7 @@
             this.cardReaderServiceInstaller.Description = "Browser HTTP Request - CardReader Serial Port Bridge";
             this.cardReaderServiceInstaller.DisplayName = "CardReader Service";
             this.cardReaderServiceInstaller.ServiceName = "CardReaderService";
+            this.cardReaderServiceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // CardReaderServiceProjectInstaller
             // 

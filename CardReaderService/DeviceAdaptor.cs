@@ -56,8 +56,8 @@ namespace CardReaderService
         public abstract int PriceNo { get; set; }
         public abstract string ExecDate { get; set; }
         public abstract string StartoverDate { get; set; }
-        public abstract int[] Price { get; set; }
-        public abstract int[] Vol { get; set; }
+        public abstract float[] Price { get; set; }
+        public abstract float[] Vol { get; set; }
 
         public abstract string getLadderString();
         public abstract bool parseLadderString(string ladderStr);

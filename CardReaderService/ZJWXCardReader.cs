@@ -17,15 +17,15 @@ namespace CardReaderService
         private int priceNo;
         private string execDate;
         private string startoverDate;
-        private int[] price; // in cents
-        private int[] vol;
+        private float[] price;
+        private float[] vol;
 
         public ZJWXLadderInfo()
         {
             // do nothing
         }
 
-        public ZJWXLadderInfo(int _priceNo, string _execDate, string _startoverDate, int[] _price, int[] _vol)
+        public ZJWXLadderInfo(int _priceNo, string _execDate, string _startoverDate, float[] _price, float[] _vol)
         {
             priceNo = _priceNo;
             execDate = _execDate;
@@ -73,7 +73,7 @@ namespace CardReaderService
             }
         }
 
-        public override int[] Price
+        public override float[] Price
         {
             get
             {
@@ -86,7 +86,7 @@ namespace CardReaderService
             }
         }
 
-        public override int[] Vol
+        public override float[] Vol
         {
             get
             {
@@ -124,16 +124,16 @@ namespace CardReaderService
             this.ExecDate = ladderArr[1];
             this.StartoverDate = ladderArr[2];
 
-            this.Price = new int[(ladderArr.Length - 3) / 2];
-            this.Vol = new int[(ladderArr.Length - 3) / 2];
+            this.Price = new float[(ladderArr.Length - 3) / 2];
+            this.Vol = new float[(ladderArr.Length - 3) / 2];
 
             for (int i = 0; i < (ladderArr.Length - 3) / 2; i++)
             {
-                int _price = 0;
-                int _vol = 0;
-                int.TryParse(ladderArr[i * 2 + 3], out _price);
+                float _price = 0;
+                float _vol = 0;
+                float.TryParse(ladderArr[i * 2 + 3], out _price);
                 this.Price[i] = _price;
-                int.TryParse(ladderArr[i * 2 + 4], out _vol);
+                float.TryParse(ladderArr[i * 2 + 4], out _vol);
                 this.Vol[i] = _vol;
             }
 
@@ -184,11 +184,11 @@ namespace CardReaderService
         private string watchType;
         private string cardType;
         private string cardNo;
-        private int orderAmount;
-        private int orderNo;
-        private int watchLimit;
-        private int overdraftAmount;
-        private int warningAmount;
+        private float orderAmount;
+        private string orderNo;
+        private float watchLimit;
+        private float overdraftAmount;
+        private float warningAmount;
         private int idle;
         private LadderInfo ladder;
 
@@ -231,7 +231,7 @@ namespace CardReaderService
             }
         }
 
-        public int OrderAmount
+        public float OrderAmount
         {
             get
             {
@@ -244,7 +244,7 @@ namespace CardReaderService
             }
         }
 
-        public int OrderNo
+        public string OrderNo
         {
             get
             {
@@ -257,7 +257,7 @@ namespace CardReaderService
             }
         }
 
-        public int WatchLimit
+        public float WatchLimit
         {
             get
             {
@@ -270,7 +270,7 @@ namespace CardReaderService
             }
         }
 
-        public int OverdraftAmount
+        public float OverdraftAmount
         {
             get
             {
@@ -283,7 +283,7 @@ namespace CardReaderService
             }
         }
 
-        public int WarningAmount
+        public float WarningAmount
         {
             get
             {
@@ -336,25 +336,23 @@ namespace CardReaderService
             char[] sp = { '|' };
             string[] paramArr = paramStr.Split(sp);
 
-            int _orderAmount = 0;
-            int _orderNo = 0;
-            int _watchLimit = 0;
-            int _overdraftAmount = 0;
-            int _warningAmount = 0;
+            float _orderAmount = 0;
+            float _watchLimit = 0;
+            float _overdraftAmount = 0;
+            float _warningAmount = 0;
             int _idle = 0;
 
             this.WatchType = paramArr[0];
             this.CardType = paramArr[1];
             this.CardNo = paramArr[2];
-            int.TryParse(paramArr[3], out _orderAmount);
+            float.TryParse(paramArr[3], out _orderAmount);
             this.OrderAmount = _orderAmount;
-            int.TryParse(paramArr[4], out _orderNo);
-            this.OrderNo = _orderNo;
-            int.TryParse(paramArr[5], out _watchLimit);
+            this.OrderNo = paramArr[4];
+            float.TryParse(paramArr[5], out _watchLimit);
             this.WatchLimit = _watchLimit;
-            int.TryParse(paramArr[6], out _overdraftAmount);
+            float.TryParse(paramArr[6], out _overdraftAmount);
             this.OverdraftAmount = _overdraftAmount;
-            int.TryParse(paramArr[7], out _warningAmount);
+            float.TryParse(paramArr[7], out _warningAmount);
             this.WarningAmount = _warningAmount;
             int.TryParse(paramArr[8], out _idle);
             this.Idle = _idle;
@@ -474,20 +472,20 @@ namespace CardReaderService
 
     public class ZJWXCardMetaInfo : CardMetaInfo
     {
-        private int meterType;
+        private int watchType;
         private int cardType;
         private byte[] cardNo;
 
-        public int MeterType
+        public int WatchType
         {
             get
             {
-                return meterType;
+                return watchType;
             }
 
             set
             {
-                meterType = value;
+                watchType = value;
             }
         }
 
@@ -524,10 +522,10 @@ namespace CardReaderService
             int ct;
 
             // get order params from request
-            if (request.QueryString["MeterType"] != null && request.QueryString["CardType"] != null && request.QueryString["CardNo"] != null)
+            if (request.QueryString["WatchType"] != null && request.QueryString["CardType"] != null && request.QueryString["CardNo"] != null)
             {
-                if (int.TryParse(request.QueryString["MeterType"], out mt) == true)
-                    this.MeterType = mt;
+                if (int.TryParse(request.QueryString["WatchType"], out mt) == true)
+                    this.WatchType = mt;
                 else
                     return ret;
 
@@ -731,7 +729,7 @@ namespace CardReaderService
             int dev = getDevNo(resultsStr);
 
             // make card
-            ret = ZJWX_GasMakeCard(dev, ((ZJWXCardMetaInfo)metaInfo).MeterType, ((ZJWXCardMetaInfo)metaInfo).CardType, ((ZJWXCardMetaInfo)metaInfo).CardNo, results);
+            ret = ZJWX_GasMakeCard(dev, ((ZJWXCardMetaInfo)metaInfo).WatchType, ((ZJWXCardMetaInfo)metaInfo).CardType, ((ZJWXCardMetaInfo)metaInfo).CardNo, results);
             if (ret == -1)
             {
                 return CardReaderResponseCode.CardError;
@@ -746,7 +744,30 @@ namespace CardReaderService
 
         public override CardReaderResponseCode ClearCard()
         {
-            throw new NotImplementedException();
+            byte[] results = new byte[255];
+
+            // open port
+            int ret = ZJWX_GasInitPort((int)this.Port, (int)this.Baudrate, results);
+            if (ret == -1)
+            {
+                return CardReaderResponseCode.CommError;
+            }
+
+            string resultsStr = System.Text.Encoding.Default.GetString(results).Trim('\0');
+            int dev = getDevNo(resultsStr);
+
+            // make card
+            ret = ZJWX_GasClearCard(dev, results);
+            if (ret == -1)
+            {
+                return CardReaderResponseCode.CardError;
+            }
+
+            // close port
+            ret = ZJWX_GasExitPort(dev);
+            // we don't care if there's closing error since writing is already done
+
+            return CardReaderResponseCode.Success;
         }
 
         public override WatchInfo ReadWatchInfo()

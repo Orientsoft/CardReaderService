@@ -108,7 +108,7 @@ namespace CardReaderService
                                                 ctx.Response.StatusCode = 500;
                                                 break;
                                             case CardReaderResponseCode.Success:
-                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
                                                 ctx.Response.StatusCode = 200;
                                                 break;
                                             default:
@@ -118,6 +118,26 @@ namespace CardReaderService
                                         }
                                         break;
                                     case "clearcard":
+                                        result = zjwxCardReader.ClearCard();
+                                        switch (result)
+                                        {
+                                            case CardReaderResponseCode.CommError:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Open port error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                            case CardReaderResponseCode.CardError:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Clear error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                            case CardReaderResponseCode.Success:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"clear\":\"OK\"}");
+                                                ctx.Response.StatusCode = 200;
+                                                break;
+                                            default:
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Unknown error\"}");
+                                                ctx.Response.StatusCode = 500;
+                                                break;
+                                        }
                                         break;
                                     case "writecard":
                                         orderInfo.Deserialize(ctx.Request);
