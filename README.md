@@ -53,7 +53,8 @@ For ZJWX card reader, parameters depends on operation.
    3. clearcard  
       No parameter needed.  
    4. writecard  
-      PamaInfo - 表类型|卡类型|卡号|充值量|充值序号|表存上限|透支量|报警量|闲置时间 (eg. 1|5|012345678909|10.00|FFFF|100.0|0.0|0|100)  
+      PamaInfo - 表类型|卡类型|卡号|充值量|充值序号|表存上限|透支量|报警量|闲置时间 (eg. 1|5|012345678909|10.00|FFFF|100.0|0.0|0|99)  
+      Please be ware that idle time should less than 100.  
       LadderInfo - 单价序号|价格执行时间(yyMMddHH) |阶梯周期起始时间(YYMMDD)|阶梯1价格| 阶梯1气量|阶梯2价格| 阶梯2气量|阶梯3价格|阶梯3气量|阶梯4价格|阶梯4气量|阶梯5价格|阶梯5气量 (eg. |||1.0000|||||||||)  
    5. readcard  
       No parameter needed.  
@@ -62,7 +63,7 @@ CardReaderService will return standard HTTP status code, as well as JSONP respon
 * Example  
 For example, the following JSONP call should write info to card:  
 ```
-http://localhost:29527/cardreader?type=0&vendor=ZJWX&operation=writecard&callback=jsonpcb&PamaInfo=1|5|012345678909|10.00|FFFF|100.0|0.0|0|100&LadderInfo=|||1.0000|||||||||  
+http://localhost:29527/cardreader?type=0&vendor=ZJWX&operation=writecard&callback=jsonpcb&PamaInfo=1|5|012345678909|10.00|FFFF|100.0|0.0|0|99&LadderInfo=|||1.0000|||||||||  
 ```
 If the operation is successful, you will receive 200 status code and the following content:  
 ```
