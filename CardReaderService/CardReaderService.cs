@@ -50,6 +50,7 @@ namespace CardReaderService
         {
             // init cardreader
             ZJWXCardReader zjwxCardReader = new ZJWXCardReader();
+            HailiCardReader hailiCardReader = new HailiCardReader();
 
             listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
             listener.Prefixes.Add(ConfigurationManager.AppSettings["HttpEndpoint"]);
@@ -68,7 +69,7 @@ namespace CardReaderService
                 int _type = 0;
                 int.TryParse(ctx.Request.QueryString["type"], out _type); // printer, cardreader
                 type = (DeviceType)_type;
-                string vendor = ctx.Request.QueryString["vendor"]; // YuChuan, ZJWX
+                string vendor = ctx.Request.QueryString["vendor"]; // YuChuan, ZJWX, Haili
                 string operation = ctx.Request.QueryString["operation"];
 
                 ZJWXOrderInfo orderInfo = new ZJWXOrderInfo();
@@ -92,6 +93,9 @@ namespace CardReaderService
                             case "ZJWX":
                                 switch (operation)
                                 {
+                                    case "setreader":
+
+                                        break;
                                     case "checkreader":
                                         break;
                                     case "makecard":
@@ -174,6 +178,133 @@ namespace CardReaderService
                                             string cardInfoStr = cardInfo.Serialize();
                                             jsonp = JsonpHandler.handle(ctx.Request, cardInfoStr);
                                             ctx.Response.StatusCode = 200;
+                                        }
+                                        break;
+                                }
+                                break;
+
+                            case "Haili":
+                                switch (operation)
+                                {
+                                    case "setreader":
+                                        int port;
+                                        int baudrate;
+
+                                        if (ctx.Request.QueryString["port"] != null)
+                                        {
+                                            if (int.TryParse(ctx.Request.QueryString["port"], out port) == true)
+                                                hailiCardReader.Port = port;
+                                            else
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
+                                                ctx.Response.StatusCode = 412;
+                                            }
+                                        }
+
+                                        if (ctx.Request.QueryString["baudrate"] != null)
+                                        {
+                                            if (int.TryParse(ctx.Request.QueryString["baudrate"], out baudrate) == true)
+                                                hailiCardReader.Baudrate = baudrate;
+                                            else
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
+                                                ctx.Response.StatusCode = 412;
+                                            }
+                                        }
+
+                                        jsonp = JsonpHandler.handle(ctx.Request, "{\"set\":\"OK\"}");
+                                        ctx.Response.StatusCode = 200;
+                                        break;
+                                    case "readcard":
+                                        CardInfo cardInfo = hailiCardReader.ReadCard();
+                                        if (cardInfo == null)
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\"}");
+                                            ctx.Response.StatusCode = 500;
+                                        }
+                                        else
+                                        {
+                                            string cardInfoStr = cardInfo.Serialize();
+                                            jsonp = JsonpHandler.handle(ctx.Request, cardInfoStr);
+                                            ctx.Response.StatusCode = 200;
+                                        }
+                                        break;
+
+                                    case "writecard":
+                                        HailiOrderInfo order = new HailiOrderInfo();
+                                        order.Deserialize(ctx.Request);
+                                        result = hailiCardReader.WriteCard(order);
+                                        if (result == CardReaderResponseCode.Success)
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
+                                            ctx.Response.StatusCode = 200;
+                                        }
+                                        else
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Write error\"}");
+                                            ctx.Response.StatusCode = 500;
+                                        }
+                                        break;
+
+                                    case "clearcard":
+                                        result = hailiCardReader.ClearCard();
+                                        if (result == CardReaderResponseCode.Success)
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"clear\":\"OK\"}");
+                                            ctx.Response.StatusCode = 200;
+                                        }
+                                        else
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Clear error\"}");
+                                            ctx.Response.StatusCode = 500;
+                                        }
+                                        break;
+
+                                    case "makecard":
+                                        HailiMetaInfo meta = new HailiMetaInfo();                                     
+                                        meta.Deserialize(ctx.Request);
+
+                                        result = hailiCardReader.MakeCard(meta);
+                                        if (result == CardReaderResponseCode.Success)
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
+                                            ctx.Response.StatusCode = 200;
+                                        }
+                                        else
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
+                                            ctx.Response.StatusCode = 500;
+                                        }
+                                        break;
+
+                                    case "checkreader":
+                                        result = hailiCardReader.CheckReader();
+                                        if (result == CardReaderResponseCode.Success)
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"check\":\"OK\"}");
+                                            ctx.Response.StatusCode = 200;
+                                        }
+                                        else
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Check error\"}");
+                                            ctx.Response.StatusCode = 500;
+                                        }
+                                        break;
+
+                                    case "clearwatch":
+                                        HailiWatchInfo watchInfo = new HailiWatchInfo();
+                                        watchInfo.Deserialize(ctx.Request);
+
+                                        result = hailiCardReader.MakeInitCard(watchInfo);
+                                        if (result == CardReaderResponseCode.Success)
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
+                                            ctx.Response.StatusCode = 200;
+                                        }
+                                        else
+                                        {
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
+                                            ctx.Response.StatusCode = 500;
                                         }
                                         break;
                                 }

@@ -95,7 +95,7 @@ namespace CardReaderService
         public abstract int Port { get; set; }
         public abstract int Baudrate { get; set; }
 
-        public abstract CardReaderResponseCode CheckReader(int port, int baudrate);
+        public abstract CardReaderResponseCode CheckReader();
         public abstract CardInfo ReadCard();
         public abstract CardReaderResponseCode WriteCard(OrderInfo order);
         public abstract CardReaderResponseCode MakeCard(CardMetaInfo metaInfo);

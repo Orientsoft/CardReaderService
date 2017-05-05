@@ -19,6 +19,8 @@ Source: "ViewShineICGas.dll"; DestDir: "{app}"; Flags: ignoreversion replacesame
 Source: "WDCRWV.DLL"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "WRwCard.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "ZJWXGas.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "HLICCard.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "HLICCSEC.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
 [Run]
 Filename: "{dotnet40}\InstallUtil.exe"; Parameters: "{app}\CardReaderService.exe"

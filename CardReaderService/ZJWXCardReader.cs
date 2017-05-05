@@ -642,7 +642,7 @@ namespace CardReaderService
         }
 
         // interface
-        public override CardReaderResponseCode CheckReader(int port, int baudrate)
+        public override CardReaderResponseCode CheckReader()
         {
             throw new NotImplementedException();
         }
