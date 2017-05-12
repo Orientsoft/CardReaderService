@@ -57,8 +57,42 @@ For ZJWX card reader, parameters depends on operation.
       Please be aware that idle time should less than 100.  
       LadderInfo - 单价序号|价格执行时间(yyMMddHH) |阶梯周期起始时间(YYMMDD)|阶梯1价格| 阶梯1气量|阶梯2价格| 阶梯2气量|阶梯3价格|阶梯3气量|阶梯4价格|阶梯4气量|阶梯5价格|阶梯5气量 (eg. |||1.0000|||||||||)  
    5. readcard  
-      No parameter needed.  
-* Return Value  
+      No parameter needed. 
+* Haili Operation  
+For Haili card reader:  
+   1. setreader  
+      port - COM port of the reader, could always be 1.  
+      baudrate - COM port baudrate, could always be 9600.  
+   2. readcard  
+      No parameter needed.  
+   3. writecard  
+      klx - 卡类型, could always be 80.  
+      kzt - 卡状态, set to 1.  
+      kh - 卡号, should be 8 digits.  
+      tm - 表条码号  
+      ql - 购气量  
+      cs - 购气次数  
+      ljgql - 累计购气量  
+      bkcs - 补卡次数  
+      ljyql - 累计用气量, always set to 0.  
+   4. clearcard  
+      No parameter needed.  
+   5. makecard  
+      klx - 卡类型, could always be 80.  
+      kzt - 卡状态, set to 1.  
+      kh - 卡号, should be 8 digits.  
+      tm - 表条码号  
+      ql - 购气量  
+      cs - 购气次数  
+      ljgql - 累计购气量  
+      bkcs - 补卡次数  
+      ljyql - 累计用气量, always set to 0.  
+   6. checkreader - don't rely on this since it will success as long as there's a card in reader  
+      No parameter needed.  
+   7. clearwatch - make a card that could be used to clear the watch  
+      kzt - 卡状态, set to 1.  
+      kh - 卡号, should be 8 digits.  
+* Return Value  
 CardReaderService will return standard HTTP status code, as well as JSONP response object.  
 * Example  
 For example, the following JSONP call should write info to card:  
