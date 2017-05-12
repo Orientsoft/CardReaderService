@@ -193,7 +193,7 @@ namespace CardReaderService
                 "\"ljgql\":{8}," +
                 "\"bkcs\":{9}," +
                 "\"ljyql\":{10}," +
-                "\"syql\":{11},",
+                "\"syql\":{11}",
                 this.Com,
                 this.Baud,
                 this.Klx,
@@ -506,7 +506,7 @@ namespace CardReaderService
                 "\"ljgql\":{8}," +
                 "\"bkcs\":{9}," +
                 "\"ljyql\":{10}," +
-                "\"syql\":{11},",
+                "\"syql\":{11}",
                 this.Com,
                 this.Baud,
                 this.Klx,
@@ -699,7 +699,7 @@ namespace CardReaderService
             ret += string.Format("\"com\":{0}," +
                 "\"baud\":{1}," +
                 "\"klx\":{2}," +
-                "\"kh\":{3},",
+                "\"kh\":{3}",
                 this.Com,
                 this.Baud,
                 this.Klx,
@@ -922,7 +922,7 @@ namespace CardReaderService
                 "\"cs\":{7}," +
                 "\"ljgql\":{8}," +
                 "\"bkcs\":{9}," +
-                "\"ljyql\":{10},",
+                "\"ljyql\":{10}",
                 this.Com,
                 this.Baud,
                 this.Klx,
@@ -1044,7 +1044,7 @@ namespace CardReaderService
     {
         // DLL imports
         [DllImportAttribute("HLICCard.dll", EntryPoint = "ReadGasCard", CallingConvention = CallingConvention.StdCall)]
-        private static extern int ReadGasCard(short com, Int32 baud, short klx, short kzt, byte[] kh, byte[] tm, Int32 ql, short cs, Int32 ljgql, short bkcs, Int32 ljyql, Int32 syql);
+        private static extern int ReadGasCard(short com, Int32 baud, ref short klx, ref short kzt, byte[] kh, byte[] tm, ref Int32 ql, ref Int32 cs, ref Int32 ljgql, ref Int32 bkcs, ref Int32 ljyql, ref Int32 syql);
 
         [DllImportAttribute("HLICCard.dll", EntryPoint = "WriteNewCard", CallingConvention = CallingConvention.StdCall)]
         private static extern int WriteNewCard(short com, Int32 baud, short klx, short kzt, byte[] kh, byte[] tm, Int32 ql, short cs, Int32 ljgql, short bkcs, Int32 ljyql);
@@ -1142,12 +1142,31 @@ namespace CardReaderService
         {
             byte[] khBytes = new byte[255];
             byte[] tmBytes = new byte[255];
+
+            short klx = 0;
+            short kzt = 0;
+            Int32 ql = 0;
+            Int32 cs = 0;
+            Int32 ljgql = 0;
+            Int32 bkcs = 0;
+            Int32 ljyql = 0;
+            Int32 syql = 0;
+
             HailiCardInfo info = new HailiCardInfo();
 
-            int ret = ReadGasCard((short)this.Port, this.Baudrate, info.Klx, info.Kzt, khBytes, tmBytes, info.Ql, (short)info.Cs, info.Ljgql, (short)info.Bkcs, info.Ljyql, info.Syql);
+            int ret = ReadGasCard((short)this.Port, this.Baudrate, ref klx, ref kzt, khBytes, tmBytes, ref ql, ref cs, ref ljgql, ref bkcs, ref ljyql, ref syql);
 
             if (ret >= 0)
             {
+                info.Klx = klx;
+                info.Kzt = kzt;
+                info.Ql = ql;
+                info.Cs = cs;
+                info.Ljgql = ljgql;
+                info.Bkcs = bkcs;
+                info.Ljyql = ljyql;
+                info.Syql = syql;
+
                 info.Kh = Encoding.Default.GetString(khBytes).Trim('\0');
                 info.Tm = Encoding.Default.GetString(tmBytes).Trim('\0');
 

@@ -22,11 +22,15 @@ Source: "HLICCard.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversio
 Source: "HLICCSEC.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "PrinterAgent.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "PrinterAgent.exe.config"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "start-printer.bat"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+
+[Icons]
+Name: "{commonstartup}\PrinterAgent"; Filename: "{app}\PrinterAgent.exe"; WorkingDir: "{app}"
 
 [Run]
 Filename: "{dotnet40}\InstallUtil.exe"; Parameters: "{app}\CardReaderService.exe"
 Filename: "net"; Parameters: "start CardReaderService"
-Filename: "{app}\PrinterAgent.exe"
+Filename: "{app}\start-printer.bat"
 
 [UninstallRun]
 Filename: "net"; Parameters: "stop CardReaderService"

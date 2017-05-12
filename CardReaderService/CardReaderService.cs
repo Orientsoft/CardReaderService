@@ -14,9 +14,6 @@ using System.IO;
 using System.Threading;
 using System.Configuration;
 
-// P/Invoke deps
-
-
 namespace CardReaderService
 {
     public class JsonpHandler
