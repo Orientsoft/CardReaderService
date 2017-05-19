@@ -67,14 +67,10 @@ For Haili card reader:
       No parameter needed.  
    3. writecard  
       klx - 卡类型, could always be 80.  
-      kzt - 卡状态, set to 1.  
       kh - 卡号, should be 8 digits.  
-      tm - 表条码号  
       ql - 购气量  
       cs - 购气次数  
       ljgql - 累计购气量  
-      bkcs - 补卡次数  
-      ljyql - 累计用气量, always set to 0.  
    4. clearcard  
       No parameter needed.  
    5. makecard  
