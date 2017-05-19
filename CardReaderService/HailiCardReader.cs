@@ -1050,9 +1050,9 @@ namespace CardReaderService
         private static extern int WriteNewCard(short com, Int32 baud, short klx, short kzt, byte[] kh, byte[] tm, Int32 ql, short cs, Int32 ljgql, short bkcs, Int32 ljyql);
 
         [DllImportAttribute("HLICCard.dll", EntryPoint = "WriteGasCard", CallingConvention = CallingConvention.StdCall)]
-        private static extern int WriteGasCard(short com, Int32 baud, short klx, short kzt, byte[] kh, Int32 ql, short cs, Int32 ljgql);
+        private static extern int WriteGasCard(short com, Int32 baud, short klx, byte[] kh, short ql, short cs, Int32 ljgql);
 
-        [DllImportAttribute("HLICCard.dll", EntryPoint = "FormatGasCard ", CallingConvention = CallingConvention.StdCall)]
+        [DllImportAttribute("HLICCard.dll", EntryPoint = "FormatGasCard", CallingConvention = CallingConvention.StdCall)]
         private static extern int FormatGasCard(short com, Int32 baud);
 
         [DllImportAttribute("HLICCard.dll", EntryPoint = "CheckGasCard", CallingConvention = CallingConvention.StdCall)]
@@ -1179,7 +1179,7 @@ namespace CardReaderService
         public override CardReaderResponseCode WriteCard(OrderInfo order)
         {
             HailiOrderInfo info = (HailiOrderInfo)order;
-            int ret = WriteGasCard((short)this.Port, this.Baudrate, (short)info.Klx, info.Kzt, Encoding.Default.GetBytes(info.Kh), (Int16)info.Ql, (short)info.Cs, info.Ljgql);
+            int ret = WriteGasCard((short)this.Port, this.Baudrate, (short)info.Klx, Encoding.Default.GetBytes(info.Kh), (Int16)info.Ql, (short)info.Cs, info.Ljgql);
 
             if (ret == 0)
                 return CardReaderResponseCode.Success;
@@ -1199,7 +1199,7 @@ namespace CardReaderService
 
         public override CardReaderResponseCode ClearCard()
         {
-            int result = CheckGasCard((short)this.Port, this.Baudrate);
+            int result = FormatGasCard((short)this.Port, this.Baudrate);
             if (result >= 0)
             {
                 return CardReaderResponseCode.Success;

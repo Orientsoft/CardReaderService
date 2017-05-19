@@ -27,6 +27,52 @@ namespace CardReaderService
         }
     }
 
+    public class Crypto
+    {
+        public static string keyseed = "9527AA55";
+        public static string decode(string encodedString, string key)
+        {
+            encodedString = encodedString.Replace('-', '+');
+            encodedString = encodedString.Replace('*', '/');
+            encodedString = encodedString.Replace('^', '=');
+
+            byte[] keyBytes = Encoding.Unicode.GetBytes(key);
+            byte[] encodedBytes = Convert.FromBase64String(encodedString.Trim('\0'));
+
+            for (int i = 0; i < encodedBytes.Length; i += 2)
+            {
+                for (int j = 0; j < keyBytes.Length; j += 2)
+                {
+                    encodedBytes[i] = Convert.ToByte(encodedBytes[i] ^ keyBytes[j]);
+                }
+            }
+
+            string decodedString = Encoding.Unicode.GetString(encodedBytes).TrimEnd('\0');
+            return decodedString;
+        }
+
+        public static string encode(string plainString, string key)
+        {
+            byte[] keyBytes = Encoding.Unicode.GetBytes(key);
+            byte[] plainBytes = Encoding.Unicode.GetBytes(plainString);
+
+            for (int i = 0; i < plainBytes.Length; i += 2)
+            {
+                for (int j = 0; j < keyBytes.Length; j += 2)
+                {
+                    plainBytes[i] = Convert.ToByte(plainBytes[i] ^ keyBytes[j]);
+                }
+            }
+
+            string encodedString = Convert.ToBase64String(plainBytes);
+            encodedString.Replace('+', '-');
+            encodedString.Replace('/', '*');
+            encodedString.Replace('=', '^');
+
+            return encodedString;
+        }
+    }
+
     public class ListenerThread
     {
         private bool listenFlag;
@@ -102,11 +148,11 @@ namespace CardReaderService
                                         {
                                             case CardReaderResponseCode.CommError:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Open port error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                             case CardReaderResponseCode.CardError:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                             case CardReaderResponseCode.Success:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
@@ -114,7 +160,7 @@ namespace CardReaderService
                                                 break;
                                             default:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Unknown error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                         }
                                         break;
@@ -124,11 +170,11 @@ namespace CardReaderService
                                         {
                                             case CardReaderResponseCode.CommError:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Open port error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                             case CardReaderResponseCode.CardError:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Clear error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                             case CardReaderResponseCode.Success:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"clear\":\"OK\"}");
@@ -136,7 +182,7 @@ namespace CardReaderService
                                                 break;
                                             default:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Unknown error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                         }
                                         break;
@@ -147,11 +193,11 @@ namespace CardReaderService
                                         {
                                             case CardReaderResponseCode.CommError:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Open port error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                             case CardReaderResponseCode.WriteError:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Write error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                             case CardReaderResponseCode.Success:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
@@ -159,7 +205,7 @@ namespace CardReaderService
                                                 break;
                                             default:
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Unknown error\"}");
-                                                ctx.Response.StatusCode = 500;
+                                                ctx.Response.StatusCode = 200;
                                                 break;
                                         }
                                         break;
@@ -168,7 +214,7 @@ namespace CardReaderService
                                         if (cardInfo == null)
                                         {
                                             jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\"}");
-                                            ctx.Response.StatusCode = 500;
+                                            ctx.Response.StatusCode = 200;
                                         }
                                         else
                                         {
@@ -194,7 +240,7 @@ namespace CardReaderService
                                             else
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
-                                                ctx.Response.StatusCode = 412;
+                                                ctx.Response.StatusCode = 200;
                                             }
                                         }
 
@@ -205,7 +251,7 @@ namespace CardReaderService
                                             else
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
-                                                ctx.Response.StatusCode = 412;
+                                                ctx.Response.StatusCode = 200;
                                             }
                                         }
 
@@ -217,7 +263,7 @@ namespace CardReaderService
                                         if (cardInfo == null)
                                         {
                                             jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\"}");
-                                            ctx.Response.StatusCode = 500;
+                                            ctx.Response.StatusCode = 200;
                                         }
                                         else
                                         {
@@ -230,6 +276,9 @@ namespace CardReaderService
                                     case "writecard":
                                         HailiOrderInfo order = new HailiOrderInfo();
                                         order.Deserialize(ctx.Request);
+                                        order.Kh = Crypto.decode(order.Kh, Crypto.keyseed);
+                                        order.Kh = order.Kh.Split('-')[0];
+
                                         result = hailiCardReader.WriteCard(order);
                                         if (result == CardReaderResponseCode.Success)
                                         {
@@ -239,7 +288,7 @@ namespace CardReaderService
                                         else
                                         {
                                             jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Write error\"}");
-                                            ctx.Response.StatusCode = 500;
+                                            ctx.Response.StatusCode = 200;
                                         }
                                         break;
 
@@ -253,7 +302,7 @@ namespace CardReaderService
                                         else
                                         {
                                             jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Clear error\"}");
-                                            ctx.Response.StatusCode = 500;
+                                            ctx.Response.StatusCode = 200;
                                         }
                                         break;
 
@@ -270,7 +319,7 @@ namespace CardReaderService
                                         else
                                         {
                                             jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
-                                            ctx.Response.StatusCode = 500;
+                                            ctx.Response.StatusCode = 200;
                                         }
                                         break;
 
@@ -284,7 +333,7 @@ namespace CardReaderService
                                         else
                                         {
                                             jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Check error\"}");
-                                            ctx.Response.StatusCode = 500;
+                                            ctx.Response.StatusCode = 200;
                                         }
                                         break;
 
@@ -301,7 +350,7 @@ namespace CardReaderService
                                         else
                                         {
                                             jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
-                                            ctx.Response.StatusCode = 500;
+                                            ctx.Response.StatusCode = 200;
                                         }
                                         break;
                                 }
@@ -309,14 +358,14 @@ namespace CardReaderService
 
                             default:
                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Vendor not found\"}");
-                                ctx.Response.StatusCode = 404;
+                                ctx.Response.StatusCode = 200;
                                 break;
                         }
                         break;
 
                     default:
                         jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Device type not found\"}");
-                        ctx.Response.StatusCode = 404;
+                        ctx.Response.StatusCode = 200;
                         break;
                 }        
 
