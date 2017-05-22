@@ -86,7 +86,7 @@ For Haili card reader:
    6. checkreader - don't rely on this since it will success as long as there's a card in reader  
       No parameter needed.  
    7. clearwatch - make a card that could be used to clear the watch  
-      kzt - 卡状态, set to 1.  
+      klx - 卡类型.  
       kh - 卡号, should be 8 digits.  
 * Return Value  
 CardReaderService will return standard HTTP status code, as well as JSONP response object.  
