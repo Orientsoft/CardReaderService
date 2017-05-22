@@ -90,8 +90,8 @@ For Haili card reader:
       kh - 卡号, should be 8 digits.  
 * Return Value  
 CardReaderService will return standard HTTP status code, as well as JSONP response object.  
-* Flow  
-   1. 总流程：清零卡->开户卡->用户卡（购气）  
+* Flow    
+   1. 总流程：清零卡->开户卡->用户卡（购气）  
    2. 补卡流程：可以直接制用户卡，补卡次数+1，注意原卡中未上表部分的处理  
    3. 开户卡流程：基本与用户卡一致，但是卡状态为0  
    4. 购气流程：读卡，验证ljgql（累计购气量）与syql（剩余气量）是否一致，若syql较小，说明卡内有气未上表，应该提醒客户先上表，再购气  
