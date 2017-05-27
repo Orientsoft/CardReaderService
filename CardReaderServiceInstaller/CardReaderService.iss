@@ -23,6 +23,8 @@ Source: "HLICCSEC.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversio
 Source: "PrinterAgent.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "PrinterAgent.exe.config"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "start-printer.bat"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "D:\software\Grid++Report 6\gregn6.dll"; DestDir: "{app}"; Flags: restartreplace sharedfile regserver
+Source: "D:\software\Grid++Report 6\grdes6.dll"; DestDir: "{app}"; Flags: restartreplace sharedfile regserver
 
 [Icons]
 Name: "{commonstartup}\PrinterAgent"; Filename: "{app}\PrinterAgent.exe"; WorkingDir: "{app}"

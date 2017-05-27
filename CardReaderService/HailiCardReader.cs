@@ -917,7 +917,7 @@ namespace CardReaderService
                 "\"klx\":{2}," +
                 "\"kzt\":{3}," +
                 "\"kh\":{4}," +
-                "\"tm\":{5}," +
+                "\"tm\":\"{5}\"," +
                 "\"ql\":{6}," +
                 "\"cs\":{7}," +
                 "\"ljgql\":{8}," +
@@ -1173,7 +1173,12 @@ namespace CardReaderService
                 return info;
             }
             else
-                return null;
+            {
+                info.Klx = -1;
+                info.Kzt = (short)ret;
+
+                return info;
+            }
         }
 
         public override CardReaderResponseCode WriteCard(OrderInfo order)
