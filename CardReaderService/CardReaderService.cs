@@ -94,9 +94,16 @@ namespace CardReaderService
             HailiCardReader hailiCardReader = new HailiCardReader();
 
             listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
-            listener.Prefixes.Add(ConfigurationManager.AppSettings["HttpEndpoint"]);
-
-            listener.Start();
+            try
+            {
+                listener.Prefixes.Add(ConfigurationManager.AppSettings["HttpEndpoint"]);
+                listener.Start();
+            }
+            catch (Exception e)
+            {
+                EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], e.Message + "\r\n" + e.StackTrace, EventLogEntryType.Error);
+            }
+            
             listenFlag = true;
             EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "HTTP listener started.", EventLogEntryType.Information);
 
@@ -431,6 +438,8 @@ namespace CardReaderService
 
         private void response(HttpListenerResponse response, string jsonp)
         {
+            response.AddHeader("Content-Security-Policy", "upgrade-insecure-requests");
+
             // write response        
             using (StreamWriter writer = new StreamWriter(response.OutputStream))
             {
