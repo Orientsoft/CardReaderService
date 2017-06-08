@@ -252,4 +252,4 @@ paket-files/
 *.sln.iml
 
 # installation package
-CardReaderServiceInstaller\Output
+CardReaderServiceInstaller/Output
