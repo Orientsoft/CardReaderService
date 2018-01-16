@@ -380,7 +380,7 @@ namespace CardReaderService
                                                 }
                                                 else
                                                 {
-                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\", \"errcode\":\"" + (int)result + "\"}");
                                                     ctx.Response.StatusCode = 200;
                                                 }
                                             }                                 

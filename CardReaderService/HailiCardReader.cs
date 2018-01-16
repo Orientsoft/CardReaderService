@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -1189,7 +1191,10 @@ namespace CardReaderService
             if (ret == 0)
                 return CardReaderResponseCode.Success;
             else
+            {
+                EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "Operation failed. Result: " + ret.ToString(), EventLogEntryType.Error);
                 return CardReaderResponseCode.WriteError;
+            }       
         }
 
         public override CardReaderResponseCode MakeCard(CardMetaInfo metaInfo)
@@ -1199,7 +1204,10 @@ namespace CardReaderService
             if (result >= 0)
                 return CardReaderResponseCode.Success;
             else
+            {
+                EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "Operation failed. Result: " + result.ToString(), EventLogEntryType.Error);
                 return CardReaderResponseCode.WriteError;
+            }
         }
 
         public override CardReaderResponseCode ClearCard()
@@ -1211,6 +1219,7 @@ namespace CardReaderService
             }
             else
             {
+                EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "Operation failed. Result: " + result.ToString(), EventLogEntryType.Error);
                 return CardReaderResponseCode.CardError;
             }
         }
@@ -1229,6 +1238,7 @@ namespace CardReaderService
             }
             else
             {
+                EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "Operation failed. Result: " + result.ToString(), EventLogEntryType.Error);
                 return CardReaderResponseCode.WriteError;
             }
         }
