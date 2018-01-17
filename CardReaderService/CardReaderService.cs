@@ -92,6 +92,7 @@ namespace CardReaderService
             // init cardreader
             ZJWXCardReader zjwxCardReader = new ZJWXCardReader();
             HailiCardReader hailiCardReader = new HailiCardReader();
+            QfCardReader qfCardReader = new QfCardReader();
 
             listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
             try
@@ -258,7 +259,7 @@ namespace CardReaderService
 
                                 case "Haili":
                                     long ts;
-                                    DateTime now = DateTime.UtcNow;
+                                    DateTime now;
 
                                     switch (operation)
                                     {
@@ -317,6 +318,7 @@ namespace CardReaderService
                                             order.Kh = order.Kh.Split(new Char[] { '-' })[0];
 
                                             // check timestamp
+                                            now = DateTime.UtcNow;
                                             now = now.AddYears(-1969);
                                             long tsNow = now.Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
@@ -363,6 +365,7 @@ namespace CardReaderService
                                             meta.Kh = meta.Kh.Split(new Char[] { '-' })[0];
 
                                             // check timestamp
+                                            now = DateTime.UtcNow;
                                             now = now.AddYears(-1969);
                                             tsNow = now.Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
@@ -409,6 +412,185 @@ namespace CardReaderService
                                             watchInfo.Kh = watchInfo.Kh.Split(new Char[] { '-' })[0];
 
                                             // check timestamp
+                                            now = DateTime.UtcNow;
+                                            now = now.AddYears(-1969);
+                                            tsNow = now.Ticks / 10000;
+                                            if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                result = hailiCardReader.MakeInitCard(watchInfo);
+                                                if (result == CardReaderResponseCode.Success)
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+                                            break;
+                                    }
+                                    break;
+
+                                case "Qf":
+                                    switch (operation)
+                                    {
+                                        case "setreader":
+                                            int port;
+                                            int baudrate;
+
+                                            if (ctx.Request.QueryString["port"] != null)
+                                            {
+                                                if (int.TryParse(ctx.Request.QueryString["port"], out port) == true)
+                                                    hailiCardReader.Port = port;
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+
+                                            if (ctx.Request.QueryString["baudrate"] != null)
+                                            {
+                                                if (int.TryParse(ctx.Request.QueryString["baudrate"], out baudrate) == true)
+                                                    hailiCardReader.Baudrate = baudrate;
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"set\":\"OK\"}");
+                                            ctx.Response.StatusCode = 200;
+                                            break;
+
+                                        case "readcard":
+                                            CardInfo cardInfo = hailiCardReader.ReadCard();
+                                            HailiCardInfo haili = (HailiCardInfo)cardInfo;
+                                            if (haili.Klx == -1)
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\", \"errcode\":\"" + haili.Kzt.ToString() + "\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                string cardInfoStr = cardInfo.Serialize();
+                                                jsonp = JsonpHandler.handle(ctx.Request, cardInfoStr);
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            break;
+
+                                        case "writecard":
+                                            HailiOrderInfo order = new HailiOrderInfo();
+                                            order.Deserialize(ctx.Request);
+                                            order.Kh = Crypto.decode(order.Kh, Crypto.keyseed);
+
+                                            long.TryParse(order.Kh.Split(new Char[] { '-' })[1], out ts);
+                                            order.Kh = order.Kh.Split(new Char[] { '-' })[0];
+
+                                            // check timestamp
+                                            now = DateTime.UtcNow;
+                                            now = now.AddYears(-1969);
+                                            long tsNow = now.Ticks / 10000;
+                                            if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                result = hailiCardReader.WriteCard(order);
+                                                if (result == CardReaderResponseCode.Success)
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Write error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+                                            break;
+
+                                        case "clearcard":
+                                            result = hailiCardReader.ClearCard();
+                                            if (result == CardReaderResponseCode.Success)
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"clear\":\"OK\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Clear error\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            break;
+
+                                        case "makecard":
+                                            HailiMetaInfo meta = new HailiMetaInfo();
+                                            meta.Deserialize(ctx.Request);
+                                            meta.Kh = Crypto.decode(meta.Kh, Crypto.keyseed);
+
+                                            long.TryParse(meta.Kh.Split(new Char[] { '-' })[1], out ts);
+                                            meta.Kh = meta.Kh.Split(new Char[] { '-' })[0];
+
+                                            // check timestamp
+                                            now = DateTime.UtcNow;
+                                            now = now.AddYears(-1969);
+                                            tsNow = now.Ticks / 10000;
+                                            if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                result = hailiCardReader.MakeCard(meta);
+                                                if (result == CardReaderResponseCode.Success)
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\", \"errcode\":\"" + (int)result + "\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+                                            break;
+
+                                        case "checkreader":
+                                            result = hailiCardReader.CheckReader();
+                                            if (result == CardReaderResponseCode.Success)
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"check\":\"OK\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Check error\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            break;
+
+                                        case "clearwatch":
+                                            HailiWatchInfo watchInfo = new HailiWatchInfo();
+                                            watchInfo.Deserialize(ctx.Request);
+                                            watchInfo.Kh = Crypto.decode(watchInfo.Kh, Crypto.keyseed);
+
+                                            long.TryParse(watchInfo.Kh.Split(new Char[] { '-' })[1], out ts);
+                                            watchInfo.Kh = watchInfo.Kh.Split(new Char[] { '-' })[0];
+
+                                            // check timestamp
+                                            now = DateTime.UtcNow;
                                             now = now.AddYears(-1969);
                                             tsNow = now.Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
