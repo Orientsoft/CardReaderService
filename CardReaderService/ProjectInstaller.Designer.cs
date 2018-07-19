@@ -36,6 +36,7 @@
             this.cardReaderServiceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.cardReaderServiceProcessInstaller.Password = null;
             this.cardReaderServiceProcessInstaller.Username = null;
+            this.cardReaderServiceProcessInstaller.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.cardReaderServiceProcessInstaller_AfterInstall);
             // 
             // cardReaderServiceInstaller
             // 
@@ -43,6 +44,7 @@
             this.cardReaderServiceInstaller.DisplayName = "CardReader Service";
             this.cardReaderServiceInstaller.ServiceName = "CardReaderService";
             this.cardReaderServiceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            this.cardReaderServiceInstaller.AfterInstall += new System.Configuration.Install.InstallEventHandler(this.cardReaderServiceInstaller_AfterInstall);
             // 
             // CardReaderServiceProjectInstaller
             // 

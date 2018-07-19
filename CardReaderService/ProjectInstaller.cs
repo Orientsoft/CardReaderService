@@ -15,5 +15,15 @@ namespace CardReaderService
         {
             InitializeComponent();
         }
+
+        private void cardReaderServiceProcessInstaller_AfterInstall(object sender, InstallEventArgs e)
+        {
+
+        }
+
+        private void cardReaderServiceInstaller_AfterInstall(object sender, InstallEventArgs e)
+        {
+
+        }
     }
 }

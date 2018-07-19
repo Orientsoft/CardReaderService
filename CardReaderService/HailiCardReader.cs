@@ -1176,6 +1176,8 @@ namespace CardReaderService
             }
             else
             {
+                EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "Operation failed. Return: " + ret.ToString(), EventLogEntryType.Error);
+
                 info.Klx = -1;
                 info.Kzt = (short)ret;
 

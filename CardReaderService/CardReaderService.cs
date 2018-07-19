@@ -448,7 +448,7 @@ namespace CardReaderService
                                             if (ctx.Request.QueryString["port"] != null)
                                             {
                                                 if (int.TryParse(ctx.Request.QueryString["port"], out port) == true)
-                                                    hailiCardReader.Port = port;
+                                                    qfCardReader.Port = port;
                                                 else
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
@@ -459,7 +459,7 @@ namespace CardReaderService
                                             if (ctx.Request.QueryString["baudrate"] != null)
                                             {
                                                 if (int.TryParse(ctx.Request.QueryString["baudrate"], out baudrate) == true)
-                                                    hailiCardReader.Baudrate = baudrate;
+                                                    qfCardReader.Baudrate = baudrate;
                                                 else
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
@@ -472,11 +472,11 @@ namespace CardReaderService
                                             break;
 
                                         case "readcard":
-                                            CardInfo cardInfo = hailiCardReader.ReadCard();
-                                            HailiCardInfo haili = (HailiCardInfo)cardInfo;
-                                            if (haili.Klx == -1)
+                                            CardInfo cardInfo = qfCardReader.ReadCard();
+                                            QfCardInfo qf = (QfCardInfo)cardInfo;
+                                            if (qf.Klx == -1)
                                             {
-                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\", \"errcode\":\"" + haili.Kzt.ToString() + "\"}");
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\", \"errcode\":\"" + qf.Kzt.ToString() + "\"}");
                                                 ctx.Response.StatusCode = 200;
                                             }
                                             else
@@ -488,7 +488,7 @@ namespace CardReaderService
                                             break;
 
                                         case "writecard":
-                                            HailiOrderInfo order = new HailiOrderInfo();
+                                            QfOrderInfo order = new QfOrderInfo();
                                             order.Deserialize(ctx.Request);
                                             order.Kh = Crypto.decode(order.Kh, Crypto.keyseed);
 
@@ -506,7 +506,7 @@ namespace CardReaderService
                                             }
                                             else
                                             {
-                                                result = hailiCardReader.WriteCard(order);
+                                                result = qfCardReader.WriteCard(order);
                                                 if (result == CardReaderResponseCode.Success)
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
@@ -521,7 +521,7 @@ namespace CardReaderService
                                             break;
 
                                         case "clearcard":
-                                            result = hailiCardReader.ClearCard();
+                                            result = qfCardReader.ClearCard();
                                             if (result == CardReaderResponseCode.Success)
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"clear\":\"OK\"}");
@@ -535,7 +535,7 @@ namespace CardReaderService
                                             break;
 
                                         case "makecard":
-                                            HailiMetaInfo meta = new HailiMetaInfo();
+                                            QfMetaInfo meta = new QfMetaInfo();
                                             meta.Deserialize(ctx.Request);
                                             meta.Kh = Crypto.decode(meta.Kh, Crypto.keyseed);
 
@@ -553,7 +553,7 @@ namespace CardReaderService
                                             }
                                             else
                                             {
-                                                result = hailiCardReader.MakeCard(meta);
+                                                result = qfCardReader.MakeCard(meta);
                                                 if (result == CardReaderResponseCode.Success)
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
@@ -568,7 +568,7 @@ namespace CardReaderService
                                             break;
 
                                         case "checkreader":
-                                            result = hailiCardReader.CheckReader();
+                                            result = qfCardReader.CheckReader();
                                             if (result == CardReaderResponseCode.Success)
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"check\":\"OK\"}");
@@ -582,7 +582,7 @@ namespace CardReaderService
                                             break;
 
                                         case "clearwatch":
-                                            HailiWatchInfo watchInfo = new HailiWatchInfo();
+                                            QfWatchInfo watchInfo = new QfWatchInfo();
                                             watchInfo.Deserialize(ctx.Request);
                                             watchInfo.Kh = Crypto.decode(watchInfo.Kh, Crypto.keyseed);
 
@@ -600,7 +600,7 @@ namespace CardReaderService
                                             }
                                             else
                                             {
-                                                result = hailiCardReader.MakeInitCard(watchInfo);
+                                                result = qfCardReader.MakeInitCard(watchInfo);
                                                 if (result == CardReaderResponseCode.Success)
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");

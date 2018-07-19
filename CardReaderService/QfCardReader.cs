@@ -1145,6 +1145,7 @@ namespace CardReaderService
             byte[] khBytes = new byte[255];
             byte[] tmBytes = new byte[255];
 
+            /*
             short klx = 0;
             short kzt = 0;
             Int32 ql = 0;
@@ -1153,10 +1154,20 @@ namespace CardReaderService
             Int32 bkcs = 0;
             Int32 ljyql = 0;
             Int32 syql = 0;
+            */
+
+            short klx = 80;
+            short kzt = 1;
+            Int32 ql = 5;
+            Int32 cs = 2;
+            Int32 ljgql = 25;
+            Int32 bkcs = 0;
+            Int32 ljyql = 0;
+            Int32 syql = 0;
 
             QfCardInfo info = new QfCardInfo();
 
-            int ret = ReadGasCard((short)this.Port, this.Baudrate, ref klx, ref kzt, khBytes, tmBytes, ref ql, ref cs, ref ljgql, ref bkcs, ref ljyql, ref syql);
+            int ret = ReadGasCard((short)3, 9600, ref klx, ref kzt, khBytes, tmBytes, ref ql, ref cs, ref ljgql, ref bkcs, ref ljyql, ref syql);
 
             if (ret >= 0)
             {
@@ -1176,6 +1187,8 @@ namespace CardReaderService
             }
             else
             {
+                EventLog.WriteEntry(ConfigurationManager.AppSettings["LogSource"], "Operation failed. Return: " + ret.ToString(), EventLogEntryType.Error);
+
                 info.Klx = -1;
                 info.Kzt = (short)ret;
 
