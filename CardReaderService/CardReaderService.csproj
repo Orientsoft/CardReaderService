@@ -67,8 +67,6 @@
     <Compile Include="CardReaderService.Designer.cs">
       <DependentUpon>CardReaderService.cs</DependentUpon>
     </Compile>
-    <Compile Include="DeviceAdaptor.cs" />
-    <Compile Include="HailiCardReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
@@ -77,9 +75,7 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QfCardReader.cs" />
-    <Compile Include="YuChuanCardReader.cs" />
-    <Compile Include="ZJWXCardReader.cs" />
+    <Compile Include="WaterCardReader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
