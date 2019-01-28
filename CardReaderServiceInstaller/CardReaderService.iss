@@ -27,6 +27,9 @@ Source: "ChiffoInf.dat"; DestDir: "{app}"; Flags: ignoreversion replacesameversi
 Source: "dcrf32.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "QFIC_IGasMeter.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
+Source: "LtA1.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "VMProtectSDK32.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+
 Source: "PrinterAgent.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "PrinterAgent.exe.config"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "start-printer.bat"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
