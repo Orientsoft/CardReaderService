@@ -1165,7 +1165,7 @@ namespace CardReaderService
             Int32 ljyql = 0;
             Int32 syql = 0;
 
-            QfCardInfo info = new QfCardInfo();
+            RxCardInfo info = new RxCardInfo();
 
             int ret = ReadGasCard((short)3, 9600, ref klx, ref kzt, khBytes, tmBytes, ref ql, ref cs, ref ljgql, ref bkcs, ref ljyql, ref syql);
 
@@ -1198,7 +1198,7 @@ namespace CardReaderService
 
         public override CardReaderResponseCode WriteCard(OrderInfo order)
         {
-            QfOrderInfo info = (QfOrderInfo)order;
+            RxOrderInfo info = (RxOrderInfo)order;
             int ret = WriteGasCard((short)this.Port, this.Baudrate, (short)info.Klx, Encoding.Default.GetBytes(info.Kh), (Int16)(info.Ql * 100), (short)info.Cs, info.Ljgql);
 
             if (ret == 0)
@@ -1212,7 +1212,7 @@ namespace CardReaderService
 
         public override CardReaderResponseCode MakeCard(CardMetaInfo metaInfo)
         {
-            QfMetaInfo meta = (QfMetaInfo)metaInfo;
+            RxMetaInfo meta = (RxMetaInfo)metaInfo;
             int result = WriteNewCard((short)this.Port, this.Baudrate, meta.Klx, meta.Kzt, Encoding.Default.GetBytes(meta.Kh), Encoding.Default.GetBytes(meta.Tm), meta.Ql, (short)meta.Cs, meta.Ljgql, (short)meta.Bkcs, meta.Ljyql);
             if (result >= 0)
                 return CardReaderResponseCode.Success;
@@ -1242,7 +1242,7 @@ namespace CardReaderService
             throw new NotImplementedException();
         }
 
-        public CardReaderResponseCode MakeInitCard(QfWatchInfo watchInfo)
+        public CardReaderResponseCode MakeInitCard(RxWatchInfo watchInfo)
         {
             int result = makeInitCard((short)this.Port, this.Baudrate, watchInfo.Klx, Encoding.Default.GetBytes(watchInfo.Kh));
             if (result >= 0)

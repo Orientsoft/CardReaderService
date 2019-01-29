@@ -627,7 +627,7 @@ namespace CardReaderService
                                             if (ctx.Request.QueryString["port"] != null)
                                             {
                                                 if (int.TryParse(ctx.Request.QueryString["port"], out port) == true)
-                                                    qfCardReader.Port = port;
+                                                    rxCardReader.Port = port;
                                                 else
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
@@ -638,7 +638,7 @@ namespace CardReaderService
                                             if (ctx.Request.QueryString["baudrate"] != null)
                                             {
                                                 if (int.TryParse(ctx.Request.QueryString["baudrate"], out baudrate) == true)
-                                                    qfCardReader.Baudrate = baudrate;
+                                                    rxCardReader.Baudrate = baudrate;
                                                 else
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
@@ -651,8 +651,8 @@ namespace CardReaderService
                                             break;
 
                                         case "readcard":
-                                            CardInfo cardInfo = qfCardReader.ReadCard();
-                                            QfCardInfo qf = (QfCardInfo)cardInfo;
+                                            CardInfo cardInfo = rxCardReader.ReadCard();
+                                            RxCardInfo qf = (RxCardInfo)cardInfo;
                                             if (qf.Klx == -1)
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\", \"errcode\":\"" + qf.Kzt.ToString() + "\"}");
@@ -667,7 +667,7 @@ namespace CardReaderService
                                             break;
 
                                         case "writecard":
-                                            QfOrderInfo order = new QfOrderInfo();
+                                            RxOrderInfo order = new RxOrderInfo();
                                             order.Deserialize(ctx.Request);
                                             order.Kh = Crypto.decode(order.Kh, Crypto.keyseed);
 
@@ -685,7 +685,7 @@ namespace CardReaderService
                                             }
                                             else
                                             {
-                                                result = qfCardReader.WriteCard(order);
+                                                result = rxCardReader.WriteCard(order);
                                                 if (result == CardReaderResponseCode.Success)
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
@@ -700,7 +700,7 @@ namespace CardReaderService
                                             break;
 
                                         case "clearcard":
-                                            result = qfCardReader.ClearCard();
+                                            result = rxCardReader.ClearCard();
                                             if (result == CardReaderResponseCode.Success)
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"clear\":\"OK\"}");
@@ -714,7 +714,7 @@ namespace CardReaderService
                                             break;
 
                                         case "makecard":
-                                            QfMetaInfo meta = new QfMetaInfo();
+                                            RxMetaInfo meta = new RxMetaInfo();
                                             meta.Deserialize(ctx.Request);
                                             meta.Kh = Crypto.decode(meta.Kh, Crypto.keyseed);
 
@@ -732,7 +732,7 @@ namespace CardReaderService
                                             }
                                             else
                                             {
-                                                result = qfCardReader.MakeCard(meta);
+                                                result = rxCardReader.MakeCard(meta);
                                                 if (result == CardReaderResponseCode.Success)
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
@@ -747,7 +747,7 @@ namespace CardReaderService
                                             break;
 
                                         case "checkreader":
-                                            result = qfCardReader.CheckReader();
+                                            result = rxCardReader.CheckReader();
                                             if (result == CardReaderResponseCode.Success)
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"check\":\"OK\"}");
@@ -761,7 +761,7 @@ namespace CardReaderService
                                             break;
 
                                         case "clearwatch":
-                                            QfWatchInfo watchInfo = new QfWatchInfo();
+                                            RxWatchInfo watchInfo = new RxWatchInfo();
                                             watchInfo.Deserialize(ctx.Request);
                                             watchInfo.Kh = Crypto.decode(watchInfo.Kh, Crypto.keyseed);
 
@@ -779,7 +779,7 @@ namespace CardReaderService
                                             }
                                             else
                                             {
-                                                result = qfCardReader.MakeInitCard(watchInfo);
+                                                result = rxCardReader.MakeInitCard(watchInfo);
                                                 if (result == CardReaderResponseCode.Success)
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
