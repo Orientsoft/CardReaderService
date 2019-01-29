@@ -1046,7 +1046,7 @@ namespace CardReaderService
     {
         // DLL imports
         [DllImportAttribute("LtA1.dll", EntryPoint = "ReadGasCard", CallingConvention = CallingConvention.StdCall)]
-        private static extern int ReadGasCard(short com, Int32 baud, ref short klx, ref short kzt, byte[] kh, byte[] tm, ref Int32 ql, ref Int32 cs, ref Int32 ljgql, ref Int32 bkcs, ref Int32 ljyql, ref Int32 syql);
+        private static extern int ReadGasCard(short com, Int32 baud, ref short klx, ref short kzt, byte[] kh, byte[] tm, ref Int32 ql, ref short cs, ref Int32 ljgql, ref short bkcs, ref Int32 ljyql, ref Int32 syql);
 
         [DllImportAttribute("LtA1.dll", EntryPoint = "WriteNewCard", CallingConvention = CallingConvention.StdCall)]
         private static extern int WriteNewCard(short com, Int32 baud, short klx, short kzt, byte[] kh, byte[] tm, Int32 ql, short cs, Int32 ljgql, short bkcs, Int32 ljyql);
@@ -1055,12 +1055,12 @@ namespace CardReaderService
         private static extern int WriteGasCard(short com, Int32 baud, short klx, byte[] kh, short ql, short cs, Int32 ljgql);
 
         [DllImportAttribute("LtA1.dll", EntryPoint = "FormatGasCard", CallingConvention = CallingConvention.StdCall)]
-        private static extern int FormatGasCard(short com, Int32 baud);
+        private static extern int FormatGasCard(short com, Int32 baud, byte[] kmm, short klx, byte[] kh, byte[] dqdm);
 
         [DllImportAttribute("LtA1.dll", EntryPoint = "CheckGasCard", CallingConvention = CallingConvention.StdCall)]
         private static extern int CheckGasCard(short com, Int32 baud);
 
-        [DllImportAttribute("LtA1.dll", EntryPoint = "makeInitCard", CallingConvention = CallingConvention.StdCall)]
+        [DllImportAttribute("LtA1.dll", EntryPoint = "MakeInitCard", CallingConvention = CallingConvention.StdCall)]
         private static extern int makeInitCard(short com, Int32 baud, short klx, byte[] kh);
 
         private string id;
@@ -1159,9 +1159,9 @@ namespace CardReaderService
             short klx = 80;
             short kzt = 1;
             Int32 ql = 5;
-            Int32 cs = 2;
+            short cs = 2;
             Int32 ljgql = 25;
-            Int32 bkcs = 0;
+            short bkcs = 0;
             Int32 ljyql = 0;
             Int32 syql = 0;
 
@@ -1171,7 +1171,7 @@ namespace CardReaderService
 
             if (ret >= 0)
             {
-                info.Klx = klx;
+                info.Klx = 80; // ignore klx since they only provide -1
                 info.Kzt = kzt;
                 info.Ql = ql / 100;
                 info.Cs = cs;
@@ -1213,7 +1213,7 @@ namespace CardReaderService
         public override CardReaderResponseCode MakeCard(CardMetaInfo metaInfo)
         {
             RxMetaInfo meta = (RxMetaInfo)metaInfo;
-            int result = WriteNewCard((short)this.Port, this.Baudrate, meta.Klx, meta.Kzt, Encoding.Default.GetBytes(meta.Kh), Encoding.Default.GetBytes(meta.Tm), meta.Ql, (short)meta.Cs, meta.Ljgql, (short)meta.Bkcs, meta.Ljyql);
+            int result = WriteNewCard((short)this.Port, this.Baudrate, meta.Klx, meta.Kzt, Encoding.Default.GetBytes(meta.Kh), Encoding.Default.GetBytes(meta.Tm), meta.Ql * 100, (short)meta.Cs, meta.Ljgql, (short)meta.Bkcs, meta.Ljyql);
             if (result >= 0)
                 return CardReaderResponseCode.Success;
             else
@@ -1225,7 +1225,11 @@ namespace CardReaderService
 
         public override CardReaderResponseCode ClearCard()
         {
-            int result = FormatGasCard((short)this.Port, this.Baudrate);
+            string kmm = "";
+            string kh = "";
+            string dqdm = "";
+
+            int result = FormatGasCard((short)this.Port, this.Baudrate, Encoding.Default.GetBytes(kmm), 80, Encoding.Default.GetBytes(kh), Encoding.Default.GetBytes(dqdm));
             if (result >= 0)
             {
                 return CardReaderResponseCode.Success;
