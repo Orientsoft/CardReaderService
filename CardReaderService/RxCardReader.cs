@@ -1052,7 +1052,7 @@ namespace CardReaderService
         private static extern int WriteNewCard(short com, Int32 baud, short klx, short kzt, byte[] kh, byte[] tm, Int32 ql, short cs, Int32 ljgql, short bkcs, Int32 ljyql);
 
         [DllImportAttribute("LtA1.dll", EntryPoint = "WriteGasCard", CallingConvention = CallingConvention.StdCall)]
-        private static extern int WriteGasCard(short com, Int32 baud, short klx, byte[] kh, short ql, short cs, Int32 ljgql);
+        private static extern int WriteGasCard(short com, Int32 baud, short klx, byte[] kh, Int32 ql, short cs, Int32 ljgql);
 
         [DllImportAttribute("LtA1.dll", EntryPoint = "FormatGasCard", CallingConvention = CallingConvention.StdCall)]
         private static extern int FormatGasCard(short com, Int32 baud, byte[] kmm, short klx, byte[] kh, byte[] dqdm);
@@ -1180,8 +1180,8 @@ namespace CardReaderService
                 info.Ljyql = ljyql;
                 info.Syql = syql;
 
-                info.Kh = Encoding.Default.GetString(khBytes).Trim('\0');
-                info.Tm = Encoding.Default.GetString(tmBytes).Trim('\0');
+                info.Kh = Encoding.Default.GetString(khBytes).Trim('\0').TrimStart('0');
+                info.Tm = Encoding.Default.GetString(tmBytes).Trim('\0').TrimStart('0');
 
                 return info;
             }
@@ -1199,7 +1199,7 @@ namespace CardReaderService
         public override CardReaderResponseCode WriteCard(OrderInfo order)
         {
             RxOrderInfo info = (RxOrderInfo)order;
-            int ret = WriteGasCard((short)this.Port, this.Baudrate, (short)info.Klx, Encoding.Default.GetBytes(info.Kh), (Int16)(info.Ql * 100), (short)info.Cs, info.Ljgql);
+            int ret = WriteGasCard((short)this.Port, this.Baudrate, (short)info.Klx, Encoding.Default.GetBytes(info.Kh), (Int32)(info.Ql * 100), (short)info.Cs, info.Ljgql);
 
             if (ret == 0)
                 return CardReaderResponseCode.Success;
