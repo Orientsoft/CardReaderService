@@ -68,6 +68,7 @@
       <DependentUpon>CardReaderService.cs</DependentUpon>
     </Compile>
     <Compile Include="DeviceAdaptor.cs" />
+    <Compile Include="EnnewCardReader.cs" />
     <Compile Include="HailiCardReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">

@@ -94,6 +94,7 @@ namespace CardReaderService
             HailiCardReader hailiCardReader = new HailiCardReader();
             QfCardReader qfCardReader = new QfCardReader();
             RxCardReader rxCardReader = new RxCardReader();
+            EnnewCardReader ennewCardReader = new EnnewCardReader(); 
 
             listener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
             try
@@ -780,6 +781,184 @@ namespace CardReaderService
                                             else
                                             {
                                                 result = rxCardReader.MakeInitCard(watchInfo);
+                                                if (result == CardReaderResponseCode.Success)
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+                                            break;
+                                    }
+                                    break;
+
+                                case "Enn":
+                                    switch (operation)
+                                    {
+                                        case "setreader":
+                                            int port;
+                                            int baudrate;
+
+                                            if (ctx.Request.QueryString["port"] != null)
+                                            {
+                                                if (int.TryParse(ctx.Request.QueryString["port"], out port) == true)
+                                                    ennewCardReader.Port = port;
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+
+                                            if (ctx.Request.QueryString["baudrate"] != null)
+                                            {
+                                                if (int.TryParse(ctx.Request.QueryString["baudrate"], out baudrate) == true)
+                                                    ennewCardReader.Baudrate = baudrate;
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Port error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+
+                                            jsonp = JsonpHandler.handle(ctx.Request, "{\"set\":\"OK\"}");
+                                            ctx.Response.StatusCode = 200;
+                                            break;
+
+                                        case "readcard":
+                                            CardInfo cardInfo = ennewCardReader.ReadCard();
+                                            EnnewCardInfo Ennew = (EnnewCardInfo)cardInfo;
+                                            if (Ennew.Klx == -1)
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Read error\", \"errcode\":\"" + Ennew.Kzt.ToString() + "\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                string cardInfoStr = cardInfo.Serialize();
+                                                jsonp = JsonpHandler.handle(ctx.Request, cardInfoStr);
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            break;
+
+                                        case "writecard":
+                                            EnnewOrderInfo order = new EnnewOrderInfo();
+                                            order.Deserialize(ctx.Request);
+                                            order.Kh = Crypto.decode(order.Kh, Crypto.keyseed);
+
+                                            long.TryParse(order.Kh.Split(new Char[] { '-' })[1], out ts);
+                                            order.Kh = order.Kh.Split(new Char[] { '-' })[0];
+
+                                            // check timestamp
+                                            now = DateTime.UtcNow;
+                                            now = now.AddYears(-1969);
+                                            long tsNow = now.Ticks / 10000;
+                                            if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                result = ennewCardReader.WriteCard(order);
+                                                if (result == CardReaderResponseCode.Success)
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"write\":\"OK\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Write error\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+                                            break;
+
+                                        case "clearcard":
+                                            result = ennewCardReader.ClearCard();
+                                            if (result == CardReaderResponseCode.Success)
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"clear\":\"OK\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Clear error\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            break;
+
+                                        case "makecard":
+                                            EnnewMetaInfo meta = new EnnewMetaInfo();
+                                            meta.Deserialize(ctx.Request);
+                                            meta.Kh = Crypto.decode(meta.Kh, Crypto.keyseed);
+
+                                            long.TryParse(meta.Kh.Split(new Char[] { '-' })[1], out ts);
+                                            meta.Kh = meta.Kh.Split(new Char[] { '-' })[0];
+
+                                            // check timestamp
+                                            now = DateTime.UtcNow;
+                                            now = now.AddYears(-1969);
+                                            tsNow = now.Ticks / 10000;
+                                            if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                result = ennewCardReader.MakeCard(meta);
+                                                if (result == CardReaderResponseCode.Success)
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                                else
+                                                {
+                                                    jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Make error\", \"errcode\":\"" + (int)result + "\"}");
+                                                    ctx.Response.StatusCode = 200;
+                                                }
+                                            }
+                                            break;
+
+                                        case "checkreader":
+                                            result = ennewCardReader.CheckReader();
+                                            if (result == CardReaderResponseCode.Success)
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"check\":\"OK\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Check error\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            break;
+
+                                        case "clearwatch":
+                                            EnnewWatchInfo watchInfo = new EnnewWatchInfo();
+                                            watchInfo.Deserialize(ctx.Request);
+                                            watchInfo.Kh = Crypto.decode(watchInfo.Kh, Crypto.keyseed);
+
+                                            long.TryParse(watchInfo.Kh.Split(new Char[] { '-' })[1], out ts);
+                                            watchInfo.Kh = watchInfo.Kh.Split(new Char[] { '-' })[0];
+
+                                            // check timestamp
+                                            now = DateTime.UtcNow;
+                                            now = now.AddYears(-1969);
+                                            tsNow = now.Ticks / 10000;
+                                            if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
+                                            {
+                                                jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
+                                                ctx.Response.StatusCode = 200;
+                                            }
+                                            else
+                                            {
+                                                result = ennewCardReader.MakeInitCard(watchInfo);
                                                 if (result == CardReaderResponseCode.Success)
                                                 {
                                                     jsonp = JsonpHandler.handle(ctx.Request, "{\"make\":\"OK\"}");
