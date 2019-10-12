@@ -12,6 +12,8 @@ OutputBaseFilename=CardReaderService_Installer
 [Files]
 Source: "CardReaderService.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "CardReaderService.exe.config"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "start-cardreader.bat"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "stop-cardreader.bat"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 
 Source: "1608card.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "Mwic_32.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
@@ -36,6 +38,7 @@ Source: "Enn.dll"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "PrinterAgent.exe"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "PrinterAgent.exe.config"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "start-printer.bat"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
+Source: "stop-printer.bat"; DestDir: "{app}"; Flags: ignoreversion replacesameversion
 Source: "D:\software\Grid++Report 6\gregn6.dll"; DestDir: "{app}"; Flags: restartreplace sharedfile regserver
 Source: "D:\software\Grid++Report 6\grdes6.dll"; DestDir: "{app}"; Flags: restartreplace sharedfile regserver
 
@@ -51,7 +54,7 @@ Filename: "{app}\certutil.exe"; Parameters: "-p welcome1 -importpfx ""My"" {app}
 Filename: "netsh.exe"; Parameters: "http add sslcert ipport=0.0.0.0:29527 certhash=4d5debaf01ffe65ec8c401635b69c7fd2c768dec appid={{29558ad6-b830-4379-9dca-568a96d16841}"
 Filename: "netsh.exe"; Parameters: "http add sslcert ipport=0.0.0.0:39527 certhash=4d5debaf01ffe65ec8c401635b69c7fd2c768dec appid={{29558ad6-b830-4379-9dca-568a96d16841}"
 Filename: "{dotnet40}\InstallUtil.exe"; Parameters: "{app}\CardReaderService.exe"
-Filename: "net"; Parameters: "start CardReaderService"
+; Filename: "net"; Parameters: "start CardReaderService"
 Filename: "{app}\start-printer.bat"
 
 [UninstallRun]
