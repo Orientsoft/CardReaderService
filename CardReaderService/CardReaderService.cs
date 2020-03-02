@@ -262,6 +262,7 @@ namespace CardReaderService
                                 case "Haili":
                                     long ts;
                                     DateTime now;
+                                    DateTime start;
 
                                     switch (operation)
                                     {
@@ -321,8 +322,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            long tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            long tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -368,8 +369,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -415,8 +416,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -499,8 +500,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            long tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            long tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -546,8 +547,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -593,8 +594,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -677,8 +678,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            long tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            long tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -724,8 +725,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -771,8 +772,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -855,8 +856,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            long tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            long tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -902,8 +903,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
@@ -949,8 +950,8 @@ namespace CardReaderService
 
                                             // check timestamp
                                             now = DateTime.UtcNow;
-                                            now = now.AddYears(-1969);
-                                            tsNow = now.Ticks / 10000;
+                                            start = new DateTime(1970, 1, 1);
+                                            tsNow = (now - start).Ticks / 10000;
                                             if (Math.Abs(ts - tsNow) > int.Parse(ConfigurationManager.AppSettings["Timeout"]))
                                             {
                                                 jsonp = JsonpHandler.handle(ctx.Request, "{\"error\":\"Timeout\"}");
